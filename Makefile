@@ -13,7 +13,6 @@ css-build:
 css-watch:
 	cd mybulma && npm run css-watch
 
-
 name=`find ./dist -name "*.wasm" | sed 's/.\/dist\///g'`
 .PHONY: build
 build:
