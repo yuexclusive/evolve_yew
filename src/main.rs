@@ -5,7 +5,7 @@ mod error_page;
 // mod forget_pwd;
 // mod layout;
 mod login;
-// mod register;
+mod register;
 // mod role_list;
 // mod user_form;
 // mod user_list;
@@ -17,7 +17,7 @@ use error_page::{page_not_found::PageNotFound, request_error::RequestError};
 // use forget_pwd::ForgetPwd;
 // use layout::layout::Layout;
 use login::Login;
-// use register::Register;
+use register::Register;
 // use role_list::RoleList;
 // use user_list::UserList;
 use yew::prelude::*;
@@ -47,8 +47,8 @@ enum Route {
     Login,
     // #[at("/forget_pwd")]
     // ForgetPwd,
-    // #[at("/register")]
-    // Register,
+    #[at("/register")]
+    Register,
     // #[at("/main/:?")]
     // Body,
     #[at("/401")]
@@ -85,11 +85,11 @@ fn switch(route: Route) -> Html {
                 <Login />
             }
         }
-        // Route::Register => {
-        //     html! {
-        //         <Register />
-        //     }
-        // }
+        Route::Register => {
+            html! {
+                <Register />
+            }
+        }
         // Route::ForgetPwd => {
         //     html! {
         //         <ForgetPwd />

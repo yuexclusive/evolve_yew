@@ -1,7 +1,9 @@
 use crate::util::common;
+use evolve_axum_cli::apis::{user_api, Error};
+use evolve_axum_cli::models;
 use gloo::timers::callback::Timeout;
-use user_cli::apis::{user_controller_api, Error};
-use user_cli::models;
+// use user_cli::apis::{user_controller_api, Error};
+// use user_cli::models;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
@@ -103,7 +105,7 @@ impl Component for Register {
                     return false;
                 }
                 ctx.link().send_future(async move {
-                    match user_controller_api::validate_exist_email(
+                    match user_api::validate_not_exist_email(
                         &common::get_cli_config_without_token().unwrap(),
                         &email,
                     )
@@ -113,20 +115,14 @@ impl Component for Register {
                         Err(err) => {
                             if let Error::ResponseError(ref err) = err {
                                 if let Some(ref err) = err.entity {
-                                    if let user_controller_api::ValidateExistEmailError::Status400(
-                                        res,
-                                    ) = err
-                                    {
+                                    if let user_api::ValidateNotExistEmailError::Status400(res) = err {
                                         return RegisterMsg::ValidateNotExistEmailFail(
-                                            res.msg.clone(),
+                                            res.message.clone(),
                                         );
                                     }
-                                    if let user_controller_api::ValidateExistEmailError::Status500(
-                                        res,
-                                    ) = err
-                                    {
+                                    if let user_api::ValidateNotExistEmailError::Status500(res) = err {
                                         return RegisterMsg::ValidateNotExistEmailFail(
-                                            res.msg.clone(),
+                                            res.message.clone(),
                                         );
                                     }
                                 }
@@ -169,7 +165,7 @@ impl Component for Register {
                             name: None,
                         };
                         ctx.link().send_future(async move {
-                            match user_controller_api::register(
+                            match user_api::register(
                                 &common::get_cli_config_without_token().unwrap(),
                                 req,
                             )
@@ -189,7 +185,7 @@ impl Component for Register {
                             from: models::SendEmailCodeFrom::Register,
                         };
                         ctx.link().send_future(async move {
-                            let res = user_controller_api::send_email_code(
+                            let res = user_api::send_email_code(
                                 &common::get_cli_config_without_token().unwrap(),
                                 req,
                             )
@@ -199,7 +195,7 @@ impl Component for Register {
                                     RegisterMsg::HandleSendEmailCodeSuccess(res.data as usize)
                                 }
                                 Err(err) => match err {
-                                    user_cli::apis::Error::ResponseError(ref f) => {
+                                    evolve_axum_cli::apis::Error::ResponseError(ref f) => {
                                         if f.status.as_u16() == 452 {
                                             // hint
                                             RegisterMsg::HandleSendEmailCodeHint(Box::new(err))
